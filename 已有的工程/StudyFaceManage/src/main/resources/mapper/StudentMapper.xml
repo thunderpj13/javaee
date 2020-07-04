@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.winit.mapper.StudentMapper">
+	<parameterMap id="Student" type="com.winit.entity.pojo.Student"></parameterMap>
+
+	<resultMap id="StudentResult" type="com.winit.entity.pojo.Student">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="phone" column="phone"/>	
+		<result property="year" column="year"/>	
+		<result property="major" column="major"/>		
+		<result property="number" column="number"/>	
+		<result property="createTime" column="create_time"/>
+		<result property="totalMoney" column="totalMoney"/>
+	</resultMap>
+	
+	<select id="studentList" resultMap="StudentResult">
+		select  a.*,b.totalMoney from students a left join (select sum(money) as totalMoney,stu_id from consumes group by stu_id) b
+		on a.id=b.stu_id
+		<where>
+			<if test="id != null ">
+			      a.id=#{id}
+			</if>			
+				  <if test='name!=null and name!=""'>
+		  	and	a.name LIKE CONCAT('%', #{name}, '%')
+		    </if>
+		</where>
+			order by create_time desc
+	</select>
+
+	<select id="getAll" resultMap="StudentResult">
+		select  * from students a
+		<where>
+			<if test="id != null ">
+			      a.id=#{id}
+			</if>			
+		  <if test='name!=null and name!=""'>
+		  	and	a.name LIKE CONCAT('%', #{name}, '%')
+		    </if>
+		</where>
+			order by create_time desc
+	</select>
+	<delete id="deletebyId">
+		delete from students  where id = #{id}
+	</delete>
+</mapper>

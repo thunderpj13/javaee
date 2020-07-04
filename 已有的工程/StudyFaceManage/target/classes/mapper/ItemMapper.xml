@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.winit.mapper.ItemMapper">
+	<parameterMap id="Item" type="com.winit.entity.pojo.Item"></parameterMap>
+
+	<resultMap id="ItemResult" type="com.winit.entity.pojo.Item">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>	
+		<result property="createTime" column="create_time"/>	
+	</resultMap>
+	
+	<select id="itemList" resultMap="ItemResult">
+		select  * from items a
+		<where>
+			<if test="id != null ">
+			      a.id=#{id}
+			</if>			
+			  <if test='name!=null and name!=""'>
+		  	and	a.name LIKE CONCAT('%', #{name}, '%')
+		    </if>
+		</where>
+		order by create_time asc
+	</select>
+
+	<select id="getAll" resultMap="ItemResult">
+		select  * from items a
+		<where>
+			<if test="id != null ">
+			      a.id=#{id}
+			</if>			
+			  <if test='name!=null and name!=""'>
+		  	and	a.name LIKE CONCAT('%', #{name}, '%')
+		    </if>
+		</where>
+		order by create_time asc
+	</select>
+	<delete id="deletebyId">
+		delete from items  where id = #{id}
+	</delete>
+</mapper>

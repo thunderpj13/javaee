@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.winit.mapper.ConsumeMapper">
+	<parameterMap id="Consume" type="com.winit.entity.pojo.Consume"></parameterMap>
+
+	<resultMap id="ConsumeResult" type="com.winit.entity.pojo.Consume">
+		<id property="id" column="id"/>
+		<result property="money" column="money"/>	
+		<result property="stuId" column="stu_id"/>
+		<result property="stuName" column="stu_name"/>
+		<result property="itemId" column="item_id"/>
+		<result property="itemName" column="item_name"/>
+		<result property="number" column="number"/>
+		<result property="consumeTime" column="consume_time"/>
+		<result property="createTime" column="create_time"/>	
+	</resultMap>
+	
+	<select id="consumeList" resultMap="ConsumeResult">
+	select  a.*,b.name as stu_name,c.name as item_name, 
+  b.number as number
+   from consumes a 
+		left join students b on a.stu_id=b.id 
+		left join items c on a.item_id=c.id
+		
+		<where>
+			<if test="id != null ">
+			      a.id=#{id}
+			</if>			
+			 <if test="stuName != null and stuName != ''">
+		   		and b.name LIKE CONCAT('%', #{stuName}, '%')
+		   </if>
+		   	<if test="number != null and number != ''">
+		   		  and b.number=#{number}
+		   </if> 
+		</where>
+			order by create_time desc
+	</select>
+<select id="getConsumeStatistics" resultMap="ConsumeResult">
+
+SELECT
+	sum(money) money,
+	b.NAME AS item_name
+FROM
+	consumes a
+LEFT JOIN items b ON a.item_id = b.id
+where a.stu_id=#{stuId}
+GROUP BY
+	a.item_id
+
+</select>
+	<select id="getAll" resultMap="ConsumeResult">
+	select  a.*,b.name as stu_name,c.name as item_name, 
+  b.number as number
+   from consumes a 
+		left join students b on a.stu_id=b.id 
+		left join items c on a.item_id=c.id
+		<where>
+			<if test="id != null ">
+			      a.id=#{id}
+			</if>			
+		 <if test="stuName != null and stuName != ''">
+		   		and b.name LIKE CONCAT('%', #{stuName}, '%')
+		   </if>
+		     	<if test="number != null and number != ''">
+		   		  and b.number=#{number}
+		   </if> 
+		</where>
+			order by create_time desc
+	</select>
+	<delete id="deletebyId">
+		delete from consumes  where id = #{id}
+	</delete>
+</mapper>

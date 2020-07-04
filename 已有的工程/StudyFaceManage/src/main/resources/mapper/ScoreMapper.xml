@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.winit.mapper.ScoreMapper">
+	<parameterMap id="Score" type="com.winit.entity.pojo.Score"></parameterMap>
+
+	<resultMap id="ScoreResult" type="com.winit.entity.pojo.Score">
+		<id property="id" column="id"/>
+		<result property="stuId" column="stu_id"/>	
+		<result property="stuName" column="stu_name"/>
+	    <result property="number" column="number"/>
+		<result property="courseId" column="course_id"/>
+		<result property="courseName" column="course_name"/>
+		<result property="score" column="score"/>	
+		<result property="createTime" column="create_time"/>	
+	</resultMap>
+	
+	<select id="scoreList" resultMap="ScoreResult">
+		select  a.*,b.name as stu_name,c.name as course_name, 
+    b.number as number 
+    from scores a 
+		left join students b on a.stu_Id=b.id
+		left join courses c on a.course_id=c.id
+		<where>
+			<if test="id != null ">
+			      a.id=#{id}
+			</if>			
+		 <if test="stuName != null and stuName != ''">
+		   		and b.name LIKE CONCAT('%', #{stuName}, '%')
+		   </if>
+		   	<if test="number != null and number != ''">
+		   		  and b.number=#{number}
+		   </if>  	
+		</where>
+			order by create_time desc
+	</select>
+
+	<select id="getAll" resultMap="ScoreResult">
+	select  a.*,b.name as stu_name,c.name as course_name, 
+    b.number as number 
+    from scores a 
+		left join students b on a.stu_Id=b.id
+		left join courses c on a.course_id=c.id
+		<where>
+			<if test="id != null ">
+			      a.id=#{id}
+			</if>			
+		 <if test="stuName != null and stuName != ''">
+		   		and b.name LIKE CONCAT('%', #{stuName}, '%')
+		   </if>
+		    	<if test="number != null and number != ''">
+		   		  and b.number=#{number}
+		   </if> 
+		</where>
+			order by create_time desc
+	</select>
+	<delete id="deletebyId">
+		delete from scores  where id = #{id}
+	</delete>
+	
+	<select id="getScoreStatistics" resultMap="ScoreResult">
+	select a.*,b.name as stu_name,c.name as course_name from scores a
+	left join students b on a.stu_id=b.id
+	left join courses c on a.course_id=c.id
+	 where stu_id=#{stuId}
+	</select>
+</mapper>

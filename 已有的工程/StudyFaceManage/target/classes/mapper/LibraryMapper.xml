@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.winit.mapper.LibraryMapper">
+	<parameterMap id="Library" type="com.winit.entity.pojo.Library"></parameterMap>
+
+	<resultMap id="LibraryResult" type="com.winit.entity.pojo.Library">
+		<id property="id" column="id"/>
+		<result property="stuId" column="stu_id"/>
+		<result property="stuName" column="stu_name"/>
+		<result property="number" column="number"/>
+		<result property="startTime" column="start_time"/>	
+		<result property="endTime" column="end_time"/>		
+		<result property="createTime" column="create_time"/>
+		<result property="hoursum" column="hoursum"/>		
+	</resultMap>
+	
+	<select id="libraryList" resultMap="LibraryResult">
+		select  a.*,b.name as stu_name,b.number as number from librarys a 
+		left join students b on a.stu_id=b.id
+		<where>
+			<if test="id != null ">
+			      a.id=#{id}
+			</if>			
+		 <if test="stuName != null and stuName != ''">
+		   		and b.name LIKE CONCAT('%', #{stuName}, '%')
+		   </if>
+		    	<if test="number != null and number != ''">
+		   		  and b.number=#{number}
+		   </if> 
+		</where>
+		order by create_time desc
+	</select>
+
+	<select id="getAll" resultMap="LibraryResult">
+	select  a.*,b.name as stu_name,b.number as number from librarys a 
+		left join students b on a.stu_id=b.id
+		<where>
+			<if test="id != null ">
+			      a.id=#{id}
+			</if>			
+		 <if test="stuName != null and stuName != ''">
+		   		and b.name LIKE CONCAT('%', #{stuName}, '%')
+		   </if>
+		   	<if test="number != null and number != ''">
+		   		  and b.number=#{number}
+		   </if> 
+		</where>
+			order by create_time desc
+	</select>
+	<delete id="deletebyId">
+		delete from librarys  where id = #{id}
+	</delete>
+	<select id="getLibraryStatistics" resultMap="LibraryResult">
+SELECT
+	sum(hoursum) as hoursum
+FROM
+	(
+		SELECT
+			TimeStampDiff(HOUR, start_time, end_time) AS hoursum
+		FROM
+			librarys
+		WHERE
+			stu_id = #{stuId}
+		AND date_format(start_time, '%Y-%m') = date_format(now(), '%Y-%m')
+	) hoursum
+			
+			
+	</select>
+</mapper>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.winit.mapper.AttendanceMapper">
+	<parameterMap id="Attendance" type="com.winit.entity.pojo.Attendance"></parameterMap>
+
+	<resultMap id="AttendanceResult" type="com.winit.entity.pojo.Attendance">
+		<id property="id" column="id"/>
+		<result property="stuId" column="stu_id"/>	
+		<result property="stuName" column="stu_name"/>	
+		<result property="detailId" column="detail_id"/>	
+		<result property="courseName" column="course_name"/>	
+		<result property="number" column="number"/>	
+		<result property="createTime" column="create_time"/>
+		<result property="attendanceTotal" column="attendanceTotal"/>
+		<result property="shouldAttenTotal" column="shouldAttenTotal"/>	
+	</resultMap>
+	
+	<select id="attendanceList" resultMap="AttendanceResult">
+	select  a.*,b.name as stu_name,
+c.name as course_name,b.number as number from attendances a  
+left join students b on a.stu_id=b.id 
+left join details c on a.detail_id=c.id
+		<where>
+			<if test="id != null ">
+			      a.id=#{id}
+			</if>			
+		 <if test="stuName != null and stuName != ''">
+		   		and b.name LIKE CONCAT('%', #{stuName}, '%')
+		   </if>
+		   	<if test="number != null and number != ''">
+		   		  and b.number=#{number}
+		   </if>  
+		</where>
+			order by create_time desc
+	</select>
+
+	<select id="getAll" resultMap="AttendanceResult">
+select  a.*,b.name as stu_name,
+c.name as course_name,b.number as number from attendances a  
+left join students b on a.stu_id=b.id 
+left join details c on a.detail_id=c.id
+		<where>
+			<if test="id != null ">
+			      a.id=#{id}
+			</if>	
+		 <if test="stuName != null and stuName != ''">
+		   		and b.name LIKE CONCAT('%', #{stuName}, '%')
+		   </if>
+		   	<if test="number != null and number != ''">
+		   		  and b.number=#{number}
+		   </if> 	
+		
+		</where>
+			order by create_time desc
+	</select>
+	<delete id="deletebyId">
+		delete from attendances  where id = #{id}
+	</delete>
+	
+	<select id="getAttendanceTotal" resultMap="AttendanceResult">	
+	SELECT
+	count(*) as attendanceTotal,
+	course_id ,
+	stu_id,
+	b.name as course_name,
+	c.name as stu_name
+	
+FROM
+	attendances a left join courses b on a.course_id=b.id
+	left join students c on a.stu_id=c.id
+WHERE
+	stu_id = #{stuId}
+GROUP BY
+	course_id,
+	stu_id
+	</select>
+	<select id="getShouldAttendanceTotal" resultMap="AttendanceResult">
+	select count(*) as shouldAttenTotal,
+	a.course_id,
+	a.stu_id
+	 from 
+
+(SELECT course_id,stu_id from attendances
+WHERE
+	stu_id = '1'
+GROUP BY
+	course_id,
+	stu_id) 
+ a left join details b on a.course_id=b.course_id  group by a.course_id,a.stu_id
+	
+	</select>
+</mapper>
